@@ -5,6 +5,7 @@ import com.senla.entity.BankCard;
 import com.senla.entity.BankCards;
 import com.senla.services.BankCardService;
 
+import java.text.ParseException;
 import java.util.List;
 
 public class ControlService
@@ -12,7 +13,7 @@ public class ControlService
     private final BankCardService bankCardService = new BankCardService();
 
 
-    public void checkCard(String userValidNumber, String userPinCode){
+    public void checkCard(String userValidNumber, String userPinCode)  {
             bankCardService.getAccess(userValidNumber, userPinCode, BankCards.getBankCards());
     }
 

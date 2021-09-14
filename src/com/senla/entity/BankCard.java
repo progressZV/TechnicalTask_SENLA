@@ -1,10 +1,13 @@
 package com.senla.entity;
 
+import java.util.Date;
+
 public class BankCard {
     private String validNumber;
     private String pinCode;
     private double balance;
     private boolean status;
+    private long blockDate;
 
     public void setValidNumber(String validNumber) {
         this.validNumber = validNumber;
@@ -38,15 +41,23 @@ public class BankCard {
         this.status = status;
     }
 
+    public long getBlockDate() {
+        return blockDate;
+    }
 
-    public BankCard(String validNumber, String pinCode, double balance, boolean status) {
+    public void setBlockDate(long blockDate) {
+        this.blockDate = blockDate;
+    }
+
+    public BankCard(String validNumber, String pinCode, double balance, long blockDate, boolean status) {
         this.validNumber = validNumber;
         this.pinCode = pinCode;
         this.balance = balance;
+        this.blockDate = blockDate;
         this.status = status;
     }
 
     public String convertToString(){
-        return getValidNumber() + " " + getPinCode() + " " + getBalance() + " " + getStatus();
+        return getValidNumber() + " " + getPinCode() + " " + getBalance() + " " + getBlockDate() + " " + getStatus();
     }
 }

@@ -2,53 +2,67 @@ package com.senla.services;
 
 import com.senla.console.actions.CheckCardDataInput;
 import com.senla.dao.FileDao;
-import com.senla.dao.Parser;
 import com.senla.entity.BankCard;
 import com.senla.entity.BankCards;
 
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 public class BankCardService {
 
     final double LIMIT = 1000000;
-
+    static int counts = 2;
+    static String previousValidNumber = "";
 
     CheckCardDataInput checkCardDataInput = new CheckCardDataInput();
 
 
     public void getAccess(String userValidNumber, String userPinCode, List<BankCard> bankCardInfo) {
         final String cardRegex = "\\d{4}([-]\\d{4}){3}";
-        final String pinRegex = "\\d{4}";
-        boolean check = false;
-        int counts = 3;
 
-        if (userValidNumber.matches(cardRegex) && userPinCode.matches(pinRegex)) {
-            System.out.println("Validation is correct, Card number and pin-code are being checked.");
-        } else {
-            System.out.println("Invalid input. Check that the entry is correct");
-        //    checkCardDataInput.getCounter(--counts);
-            checkCardDataInput.execute();
-        }
-        if (counts == 0) {
-            System.out.println("ENOUGH");
+
+        if (userValidNumber.matches(cardRegex)) {
+            System.out.println("Validation number is correct, Card number is being checked.");
         }
 
-        for (BankCard bankCard : bankCardInfo) {
-            if (bankCard.getValidNumber().equals(userValidNumber) && bankCard.getPinCode().equals(userPinCode)) {
+
+        BankCard bankCard = bankCardInfo.stream().filter(bk -> bk.getValidNumber().equals(userValidNumber) &&
+                bk.getPinCode().equals(userPinCode)).findFirst().orElse(null);
+
+        if (counts == 0 && bankCard == null) {
+            blockUserCard(userValidNumber, bankCardInfo);
+            System.out.println("Your card is still blocked. Try later.");
+            System.exit(0);
+        }
+
+        if (!previousValidNumber.equals(userValidNumber)) {
+            counts = 2;
+        }
+        previousValidNumber = userValidNumber;
+
+        if(bankCard!= null) {
+
+                boolean status = isLocked(userValidNumber, userPinCode, bankCardInfo);
+
+                if (status) {
+                    System.out.println("Your card is still blocked. Try later.");
+                    System.exit(0);
+                }
+
                 System.out.println("The check has been successfully passed. All data is correct.");
+                --counts;
                 bankCardInfo.set(bankCardInfo.indexOf(bankCard), bankCardInfo.get(0));
                 bankCardInfo.set(0, bankCard);
-                check = true;
             }
-        }
+            else {
+                    --counts;
 
-        if (!check) {
-            System.out.println("Incorrect number or pin-code entered");
-            --counts;
-            checkCardDataInput.execute();
-        }
+                    checkCardDataInput.execute();
+            }
+
+
+      //  return;
     }
 
     public void checkBalance(List<BankCard> bankCardInfo) {
@@ -74,7 +88,6 @@ public class BankCardService {
 
         if (answer <= moneyCount) {
             currentBankCard.setBalance(moneyCount - answer);
-            //    fileDao.replaceLastWord(String.valueOf(account.getBalance()));
             bankCardInfo.set(0, currentBankCard);
             System.out.println("The amount has been successfully withdrawn from your account.");
         } else {
@@ -100,7 +113,6 @@ public class BankCardService {
         if (answer <= LIMIT && answer > 0) {
             currentBankCard.setBalance(moneyCount + answer);
             bankCardInfo.set(0, currentBankCard);
-            //     fileDao.replaceLastWord(String.valueOf(account.getBalance()));
             System.out.println("The balance has been successfully replenished.");
         } else if (answer > LIMIT) {
             System.out.println("The amount of the replenishment must not exceed " + moneyCount);
@@ -117,4 +129,42 @@ public class BankCardService {
         }
         FileDao.writeFile(sb.toString());
     }
+
+    private void blockUserCard(String userValidNumber, List<BankCard> bankCardInfo) {
+        Date currentDate = new Date();
+        long diffInHours = TimeUnit.MICROSECONDS.toHours(currentDate.getTime());
+
+        for (BankCard bankCard : bankCardInfo) {
+            if (bankCard.getValidNumber().equals(userValidNumber)) {
+                bankCard.setStatus(false);
+                bankCard.setBlockDate(diffInHours);
+            }
+        }
+        saveBankCardsHistory();
+    }
+
+    private Boolean isLocked(String userValidNumber, String userPinCode, List<BankCard> bankCardInfo) {
+
+            for (BankCard bankCard : bankCardInfo) {
+                if (bankCard.getValidNumber().equals(userValidNumber) && bankCard.getPinCode().equals(userPinCode)) {
+                    if (bankCard.getStatus()) {
+                        return false;
+                    } else {
+                        Date currentDate = new Date();
+                        long timeOfCardBlocking = bankCard.getBlockDate();
+                        long currentTimeInHours = TimeUnit.MICROSECONDS.toHours(currentDate.getTime());
+
+                   //     long duration = currentDate.getTime() - lockDate.getTime();
+                        long diffInHours = currentTimeInHours - timeOfCardBlocking;
+                        if (diffInHours >= 24) {
+                            bankCard.setStatus(true);
+                            bankCard.setBlockDate(0);
+                            return false;
+                        }
+                    }
+                }
+            }
+        return true;
+    }
+
 }
