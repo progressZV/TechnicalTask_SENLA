@@ -47,6 +47,6 @@ public class BankCard {
     }
 
     public String convertToString(){
-        return getValidNumber() + getPinCode();
+        return getValidNumber() + " " + getPinCode() + " " + getBalance() + " " + getStatus();
     }
 }

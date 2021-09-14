@@ -1,6 +1,10 @@
 package com.senla.dao;
 
+import com.senla.entity.BankCard;
+import com.senla.entity.BankCards;
+
 import java.io.*;
+import java.util.List;
 
 
 public class FileDao {
