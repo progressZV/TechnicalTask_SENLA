@@ -5,6 +5,10 @@ import com.senla.dao.FileDao;
 import com.senla.entity.BankCard;
 import com.senla.entity.BankCards;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +18,7 @@ public class BankCardService {
     final double LIMIT = 1000000;
     static int counts = 2;
     static String previousValidNumber = "";
+    static long diffInHours = 0;
 
     CheckCardDataInput checkCardDataInput = new CheckCardDataInput();
 
@@ -32,7 +37,7 @@ public class BankCardService {
 
         if (counts == 0 && bankCard == null) {
             blockUserCard(userValidNumber, bankCardInfo);
-            System.out.println("Your card is still blocked. Try later.");
+            System.out.println("Your card is blocking now. Try it again after 1 day.");
             System.exit(0);
         }
 
@@ -46,7 +51,7 @@ public class BankCardService {
                 boolean status = isLocked(userValidNumber, userPinCode, bankCardInfo);
 
                 if (status) {
-                    System.out.println("Your card is still blocked. Try later.");
+                    System.out.println("Your card is still blocked. Try later, after " + diffInHours + " hour(s)");
                     System.exit(0);
                 }
 
@@ -131,13 +136,17 @@ public class BankCardService {
     }
 
     private void blockUserCard(String userValidNumber, List<BankCard> bankCardInfo) {
+
         Date currentDate = new Date();
-        long diffInHours = TimeUnit.MICROSECONDS.toHours(currentDate.getTime());
+        long currentDateTime = currentDate.getTime();
+        long currentDateInHours = (currentDateTime / (60 * 60 * 1000));
+
 
         for (BankCard bankCard : bankCardInfo) {
             if (bankCard.getValidNumber().equals(userValidNumber)) {
                 bankCard.setStatus(false);
-                bankCard.setBlockDate(diffInHours);
+                bankCard.setBlockDate(currentDateInHours);
+
             }
         }
         saveBankCardsHistory();
@@ -151,11 +160,12 @@ public class BankCardService {
                         return false;
                     } else {
                         Date currentDate = new Date();
-                        long timeOfCardBlocking = bankCard.getBlockDate();
-                        long currentTimeInHours = TimeUnit.MICROSECONDS.toHours(currentDate.getTime());
+                        long currentDateTime = currentDate.getTime();
+                        long currentDateInHours = (currentDateTime / (60 * 60 * 1000));
 
-                   //     long duration = currentDate.getTime() - lockDate.getTime();
-                        long diffInHours = currentTimeInHours - timeOfCardBlocking;
+                        long timeOfCardBlockingInHours = bankCard.getBlockDate();
+
+                        diffInHours = currentDateInHours - timeOfCardBlockingInHours;
                         if (diffInHours >= 24) {
                             bankCard.setStatus(true);
                             bankCard.setBlockDate(0);
