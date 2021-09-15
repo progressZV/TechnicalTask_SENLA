@@ -1,7 +1,6 @@
 package com.senla.console;
 
 
-import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -19,14 +18,14 @@ public class Navigator {
         }
     }
 
-    public void navigate(Integer index) throws IOException {
+    public void navigate(Integer index) {
         // validateUserInput method can be added
         try {
             Scanner scanner = new Scanner(System.in);
             MenuItem menuItem = currentMenu.getMenuItems()[index - 1];
             if (menuItem.getAction() != null) {
                 menuItem.doAction();
-                System.out.println("Press enter to continue");
+                System.out.println("Press any button(s) to continue");
                 scanner.nextLine();
             }
             clearConsole();

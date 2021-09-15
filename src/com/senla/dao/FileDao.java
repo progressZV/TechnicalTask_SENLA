@@ -1,17 +1,13 @@
 package com.senla.dao;
 
-import com.senla.entity.BankCard;
-import com.senla.entity.BankCards;
-
 import java.io.*;
-import java.util.List;
 
 
 public class FileDao {
     private static String path = "data.txt";
 
     public FileDao(String path) {
-        this.path = path;
+        FileDao.path = path;
     }
 
     public static String readFile() {

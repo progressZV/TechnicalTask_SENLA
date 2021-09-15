@@ -1,6 +1,5 @@
 package com.senla.console.actions;
 
-import com.senla.entity.BankCards;
 import com.senla.facade.ControlService;
 
 import java.util.Scanner;

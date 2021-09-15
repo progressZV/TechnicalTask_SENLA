@@ -1,6 +1,5 @@
 package com.senla.console.actions;
 
-import com.senla.entity.BankCard;
 import com.senla.facade.ControlService;
 
 

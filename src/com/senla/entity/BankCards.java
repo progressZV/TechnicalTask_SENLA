@@ -1,9 +1,6 @@
 package com.senla.entity;
 
 import com.senla.dao.Parser;
-
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BankCards {

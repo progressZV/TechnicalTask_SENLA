@@ -1,13 +1,10 @@
 package com.senla.console;
 
-import com.senla.console.items.MenuItem;
-
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class MenuController {
-    private Builder builder;
-    private Navigator navigator;
+    private final Builder builder;
+    private final Navigator navigator;
 
     public MenuController(Builder builder, Navigator navigator) {
         this.builder = builder;
@@ -33,7 +30,6 @@ public class MenuController {
                         System.out.println("Invalid input.");
                     }
                 } while(choice <= 0 || choice > menuLength);
-
                 navigator.navigate(choice);
             }
         } // solve it

@@ -1,21 +1,12 @@
 package com.senla.entity;
 
-import java.util.Date;
-
 public class BankCard {
-    private String validNumber;
-    private String pinCode;
+    private final String validNumber;
+    private final String pinCode;
     private double balance;
     private boolean status;
     private long blockDate;
 
-    public void setValidNumber(String validNumber) {
-        this.validNumber = validNumber;
-    }
-
-    public void setPinCode(String pinCode) {
-        this.pinCode = pinCode;
-    }
 
     public String getValidNumber() {
         return validNumber;

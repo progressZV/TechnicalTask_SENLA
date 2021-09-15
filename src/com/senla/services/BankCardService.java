@@ -5,12 +5,8 @@ import com.senla.dao.FileDao;
 import com.senla.entity.BankCard;
 import com.senla.entity.BankCards;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.temporal.ChronoField;
+
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 
 public class BankCardService {
@@ -28,7 +24,7 @@ public class BankCardService {
 
 
         if (userValidNumber.matches(cardRegex)) {
-            System.out.println("Validation number is correct, Card number is being checked.");
+            System.out.println("The validity of the number is verified. Card number is being checked.");
         }
 
 
@@ -37,7 +33,7 @@ public class BankCardService {
 
         if (counts == 0 && bankCard == null) {
             blockUserCard(userValidNumber, bankCardInfo);
-            System.out.println("Your card is blocking now. Try it again after 1 day.");
+            System.out.println("You entered the pin code incorrectly three times. Your card is blocked. Try it again after 1 day.");
             System.exit(0);
         }
 
@@ -51,7 +47,7 @@ public class BankCardService {
                 boolean status = isLocked(userValidNumber, userPinCode, bankCardInfo);
 
                 if (status) {
-                    System.out.println("Your card is still blocked. Try later, after " + diffInHours + " hour(s)");
+                    System.out.println("Your card is still blocked. Try later, after " + (24 - diffInHours) + " hour(s)");
                     System.exit(0);
                 }
 
@@ -61,13 +57,12 @@ public class BankCardService {
                 bankCardInfo.set(0, bankCard);
             }
             else {
-                    --counts;
-
+                    System.out.println("Invalid input");
+                        System.out.println("You have " + (counts) + " tries, or your card will be blocked.");
+                --counts;
                     checkCardDataInput.execute();
             }
 
-
-      //  return;
     }
 
     public void checkBalance(List<BankCard> bankCardInfo) {
